@@ -7,18 +7,27 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "Produit")
+@Table(name = "produit")
 @Getter
 @Setter
 public class Produit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_produit")
     private Long idProduit;
+
+    @Column(name = "nom")
     private String nom;
+
+    @Column(name = "categorie")
     private String categorie;
+
+    @Column(name = "prix")
     private double prix;
+
+    @Column(name = "quantity")
     private int quantity;
 
-    @OneToMany(mappedBy = "Id_produit" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "produit", cascade = CascadeType.ALL)
     private List<LigneCommande> ligneCommandes;
 }

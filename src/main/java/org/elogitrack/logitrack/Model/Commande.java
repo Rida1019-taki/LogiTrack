@@ -3,36 +3,38 @@ package org.elogitrack.logitrack.Model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.context.annotation.EnableMBeanExport;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "Commande")
+@Table(name = "commande")
 @Getter
 @Setter
 public class Commande {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_commande")
     private Long idCommande;
+
+    @Column(name = "date_commande")
     private LocalDate dateCommande;
 
-    @Enumerated(EnumType.STRING)
-    private StatutCommande statut;
+    @Column(name = "statut")
+    private String statut;
+
+    @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL)
+    private List<LigneCommande> ligneCommande;
+
+    @ManyToOne
+    @JoinColumn(name = "id_client", nullable = false)
+    private Client client;
 
     public Commande() {
     }
 
-    public Commande(LocalDate dateCommande, StatutCommande statut) {
+    public Commande(LocalDate dateCommande, String statut) {
         this.dateCommande = dateCommande;
         this.statut = statut;
     }
-
-    @OneToMany(mappedBy = "id_ligneCommande" , cascade = CascadeType.ALL)
-    private List<LigneCommande> ligneCommande;
-
-    @ManyToOne
-    @JoinColumn(name = "id_Client")
-    private Client client;
 }

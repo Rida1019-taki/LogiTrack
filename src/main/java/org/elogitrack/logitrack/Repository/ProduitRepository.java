@@ -9,10 +9,10 @@ import java.util.List;
 
 @Repository
 public interface ProduitRepository extends JpaRepository<Produit , Long> {
-    List<Produit> finByCategorie(String categorie);
+    List<Produit> findByCategorie(String categorie);
 
-    List<Produit> finByPrix(double prix);
+    List<Produit> findByPrix(double prix);
 
-    @Query("SELECT p FROM Produit p WHERE p.quantiteStock < 5")
+    @Query("SELECT p FROM Produit p WHERE p.quantity < 5")
     List<Produit> findProduitsLowStock();
 }

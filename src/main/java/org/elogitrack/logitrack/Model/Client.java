@@ -7,16 +7,26 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "Client")
+@Table(name = "client")
 @Getter
 @Setter
+@SuppressWarnings("JpaDataSourceORMInspection")
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_client")
     private Long idClient;
+
+    @Column(name = "nom")
     private String nom;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "telefone")
     private String telefone;
+
+    @Column(name = "ville")
     private String ville;
 
     public Client() {
@@ -29,6 +39,6 @@ public class Client {
         this.ville = ville;
     }
 
-    @OneToMany(mappedBy = "id_Commande" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<Commande> commandes;
 }

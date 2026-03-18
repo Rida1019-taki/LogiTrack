@@ -53,6 +53,11 @@ public class CommandeService {
     public List<Commande> getCommandeByIdClient(Long id){
         return commandeRepository.findCommandeByIdClient(id);
     }
+
+    public long countCommande(){
+        return commandeRepository.countCommandes();
+    }
+
     public List<Commande> getAllCommandes() {
         return commandeRepository.findAll();
     }

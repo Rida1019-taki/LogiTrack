@@ -14,7 +14,7 @@ public class ClientController {
     private ClientService clientService;
 
     @PostMapping
-    public Client addClient(Client client){
+    public Client addClient(@RequestBody Client client){
         return clientService.saveClient(client);
     }
 
@@ -24,12 +24,12 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
-    public Client getClientById(Long id){
-        return clientService.getClientById(id).orElseThrow();
+    public Client getClientById(@PathVariable("id") Long id){
+        return clientService.getClientById(id);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteClient(Long id){
+    public void deleteClient(@PathVariable("id") Long id){
         clientService.deleteClient(id);
     }
 }

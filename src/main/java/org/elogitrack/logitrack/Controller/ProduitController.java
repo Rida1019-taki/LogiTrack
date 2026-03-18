@@ -14,7 +14,7 @@ public class ProduitController {
     private ProduitService produitService;
 
     @PostMapping
-    public Produit addProdouit(Produit produit){
+    public Produit addProdouit(@RequestBody Produit produit){
         return produitService.saveProduit(produit);
     }
 
@@ -38,4 +38,8 @@ public class ProduitController {
         return produitService.findProduitByLowStock(quantity);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteProduit(@PathVariable("id") Long id){
+        produitService.deleteProduit(id);
+    }
 }

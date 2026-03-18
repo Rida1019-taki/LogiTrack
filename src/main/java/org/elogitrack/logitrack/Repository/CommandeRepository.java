@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface CommandeRepository extends JpaRepository<Commande , Long> {
-    List<Commande> findByClient_IdClient(Long clientId);
+    List<Commande> findCommandeByIdClient(Long clientId);
 
     @Query("SELECT COUNT(c) FROM Commande c")
     long countCommandes();

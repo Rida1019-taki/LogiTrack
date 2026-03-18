@@ -3,6 +3,7 @@ package org.elogitrack.logitrack.Repository;
 import org.elogitrack.logitrack.Model.Produit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,8 +12,8 @@ import java.util.List;
 public interface ProduitRepository extends JpaRepository<Produit , Long> {
     List<Produit> findByCategorie(String categorie);
 
-    List<Produit> findByPrix(double prix);
+    List<Produit> findByPrixLessThan(double prix);
 
     @Query("SELECT p FROM Produit p WHERE p.quantity < 5")
-    List<Produit> findProduitsLowStock();
+    List<Produit> findProduitsLowStock(@Param("qantity") int qantity);
 }

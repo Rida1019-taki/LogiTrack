@@ -19,7 +19,7 @@ public class ClientService {
     }
 
     public Client getClientById(Long id) {
-        return clientRepository.findById(id).orElseThrow();
+        return clientRepository.findById(id).orElseThrow(() -> new RuntimeException("Client ma-kaynch!"));
     }
 
     public Client saveClient(Client client) {

@@ -1,5 +1,7 @@
 package org.elogitrack.logitrack.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,5 +23,7 @@ public class LigneCommande {
 
     @ManyToOne
     @JoinColumn(name = "id_commande", nullable = false)
+    @JsonIgnore
+    @JsonIgnoreProperties("ligneCommande")
     private Commande commande;
 }

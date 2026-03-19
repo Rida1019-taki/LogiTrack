@@ -3,6 +3,7 @@ package org.elogitrack.logitrack.Service;
 import org.elogitrack.logitrack.Model.Commande;
 import org.elogitrack.logitrack.Model.LigneCommande;
 import org.elogitrack.logitrack.Model.Produit;
+import org.elogitrack.logitrack.Repository.ClientRepository;
 import org.elogitrack.logitrack.Repository.CommandeRepository;
 import org.elogitrack.logitrack.Repository.LigneCommandeRepository;
 import org.elogitrack.logitrack.Repository.ProduitRepository;
@@ -23,11 +24,22 @@ public class CommandeService {
     private LigneCommandeRepository ligneCommandeRepository;
 
     @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
     private ProduitRepository produitRepository;
 
     public Commande createCommande(Commande commande){
+        Long clientId = commande.getClient().getIdClient();
+
+        var existingClient = clientRepository.findById(clientId)
+                .orElseThrow(() -> new RuntimeException("Client introuvable avec l'id: " + clientId));
+
+        commande.setClient(existingClient);
+
         commande.setDateCommande(LocalDate.now());
-        commande.setStatut("EN ATTENTE");
+        commande.setStatut("EN_ATTENTE");
+
         return commandeRepository.save(commande);
     }
 

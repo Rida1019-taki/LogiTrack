@@ -1,10 +1,13 @@
 package org.elogitrack.logitrack.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,10 +27,11 @@ public class Commande {
     private String statut;
 
     @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL)
-    private List<LigneCommande> ligneCommande;
+    private List<LigneCommande> ligneCommanden = new ArrayList<>();
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_client", nullable = false)
+    @JsonIgnore
     private Client client;
 
     public Commande() {

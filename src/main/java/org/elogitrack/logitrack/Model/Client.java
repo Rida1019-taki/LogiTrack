@@ -1,5 +1,6 @@
 package org.elogitrack.logitrack.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,5 +41,6 @@ public class Client {
     }
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Commande> commandes;
 }

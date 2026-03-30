@@ -1,6 +1,7 @@
-package org.elogitrack.logitrack.Repository;
+package org.elogitrack.logitrack.repository;
 
-import org.elogitrack.logitrack.Model.Commande;
+
+import org.elogitrack.logitrack.model.Commande;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CommandeRepository extends JpaRepository<Commande , Long> {
+public interface CommandeRepository extends JpaRepository<Commande, Long> {
     @Query("SELECT c FROM Commande c WHERE c.client.id = :clientId")
 
     List<Commande> findCommandeByIdClient(@Param("clientId") Long clientId);

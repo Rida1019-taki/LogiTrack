@@ -1,7 +1,10 @@
-package org.elogitrack.logitrack.Service;
+package org.elogitrack.logitrack.service;
 
-import org.elogitrack.logitrack.Model.Client;
-import org.elogitrack.logitrack.Repository.ClientRepository;
+import org.elogitrack.logitrack.dto.clientdto.ClientRequestDTO;
+import org.elogitrack.logitrack.dto.clientdto.ClientResponseDTO;
+import org.elogitrack.logitrack.model.Client;
+import org.elogitrack.logitrack.repository.ClientRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,19 +14,31 @@ import java.util.Optional;
 @Service
 public class ClientService {
 
-    @Autowired
-    private ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
+    private final ModelMapper modelMapper;
 
-    public List<Client> getAllClients() {
-        return clientRepository.findAll();
+    public ClientService(ClientRepository clientRepository,
+                         ModelMapper modelMapper) {
+        this.clientRepository = clientRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public Client getClientById(Long id) {
-        return clientRepository.findById(id).orElseThrow(() -> new RuntimeException("Client ma-kaynch!"));
+    public List<ClientResponseDTO> getAllClients() {
+        return clientRepository.findAll()
+                .stream()
+                .map(client -> modelMapper.map(client, ClientResponseDTO.class))
+                .toList();
     }
 
-    public Client saveClient(Client client) {
-        return clientRepository.save(client);
+    public ClientResponseDTO getClientById(Long id) {
+        Client client = clientRepository.findById(id).orElseThrow(() -> new RuntimeException("Client introuvable"));
+        return modelMapper.map(client, ClientResponseDTO.class);
+    }
+
+    public ClientResponseDTO saveClient(ClientRequestDTO dto){
+        Client client = modelMapper.map(dto, Client.class);
+        Client saved = clientRepository.save(client);
+        return modelMapper.map(saved, ClientResponseDTO.class);
     }
 
     public void deleteClient(Long id) {

@@ -1,44 +1,82 @@
-package org.elogitrack.logitrack.Service;
+package org.elogitrack.logitrack.service;
 
-import org.elogitrack.logitrack.Model.Produit;
-import org.elogitrack.logitrack.Repository.ProduitRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.elogitrack.logitrack.dto.produitdto.ProduitRequestDTO;
+import org.elogitrack.logitrack.dto.produitdto.ProduitResponseDTO;
+import org.elogitrack.logitrack.model.Produit;
+import org.elogitrack.logitrack.repository.LigneCommandeRepository;
+import org.elogitrack.logitrack.repository.ProduitRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProduitService {
 
-    @Autowired
-    private ProduitRepository produitRepository;
+    private final ProduitRepository produitRepository;
+    private final LigneCommandeRepository ligneCommandeRepository;
+    private final ModelMapper modelMapper;
 
-    public List<Produit> getAllProduits() {
-        return produitRepository.findAll();
+    public ProduitService(ProduitRepository produitRepository,
+                          LigneCommandeRepository ligneCommandeRepository,
+                          ModelMapper modelMapper) {
+        this.produitRepository = produitRepository;
+        this.ligneCommandeRepository = ligneCommandeRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public Produit getProduitById(Long id) {
-        return produitRepository.findById(id).orElseThrow();
+    public ProduitResponseDTO createProduit(ProduitRequestDTO dto) {
+        Produit produit = modelMapper.map(dto, Produit.class);
+        produit = produitRepository.save(produit);
+        return modelMapper.map(produit, ProduitResponseDTO.class);
     }
 
-    public List<Produit> findProduitBycategorie(String categorie){
-        return produitRepository.findByCategorie(categorie);
+    public List<ProduitResponseDTO> getAllProduits() {
+        return produitRepository.findAll()
+                .stream()
+                .map(p -> modelMapper.map(p, ProduitResponseDTO.class))
+                .toList();
     }
 
-    public List<Produit> findProduitByPrix(double prix){
-        return produitRepository.findByPrixLessThan(prix);
+    public ProduitResponseDTO getProduitById(Long id) {
+        Produit produit = produitRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produit introuvable"));
+
+        return modelMapper.map(produit, ProduitResponseDTO.class);
     }
 
-    public List<Produit> findProduitByLowStock(int quantity){
-        return produitRepository.findProduitsLowStock(quantity);
+    public List<ProduitResponseDTO> getProduitsByCategory(String categorie){
+        return produitRepository.findByCategorie(categorie)
+                .stream()
+                .map(p -> modelMapper.map(p, ProduitResponseDTO.class))
+                .toList();
     }
 
-    public Produit saveProduit(Produit produit) {
-        return produitRepository.save(produit);
+    public List<ProduitResponseDTO> getProduitsByPriceLessThan(double prix){
+        return produitRepository.findByPrixLessThan(prix)
+                .stream()
+                .map(p -> modelMapper.map(p, ProduitResponseDTO.class))
+                .toList();
+    }
+
+    public List<ProduitResponseDTO> getLowStockProduits(int quantity){
+        return produitRepository.findProduitsLowStock(quantity)
+                .stream()
+                .map(p -> modelMapper.map(p, ProduitResponseDTO.class))
+                .toList();
     }
 
     public void deleteProduit(Long id) {
         produitRepository.deleteById(id);
+    }
+
+    public ProduitResponseDTO getTopProduit() {
+        Long produitId = ligneCommandeRepository.findTopProduct();
+        if(produitId == null) return null;
+
+        Produit produit = produitRepository.findById(produitId)
+                .orElseThrow(() -> new RuntimeException("Produit introuvable"));
+
+        return modelMapper.map(produit, ProduitResponseDTO.class);
     }
 }

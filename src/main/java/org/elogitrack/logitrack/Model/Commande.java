@@ -1,4 +1,4 @@
-package org.elogitrack.logitrack.Model;
+package org.elogitrack.logitrack.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

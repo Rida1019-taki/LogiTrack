@@ -1,13 +1,12 @@
-package org.elogitrack.logitrack.Repository;
+package org.elogitrack.logitrack.repository;
 
-import org.elogitrack.logitrack.Model.LigneCommande;
-import org.elogitrack.logitrack.Model.Produit;
+import org.elogitrack.logitrack.model.LigneCommande;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LigneCommandeRepository extends JpaRepository<LigneCommande , Long> {
-    @Query("SELECT l.produit FROM LigneCommande l GROUP BY l.produit ORDER BY SUM(l.quantity) DESC LIMIT 1")
-    Produit findTopProduct();
+    @Query(value = "SELECT id_produit FROM ligne_commande GROUP BY id_produit ORDER BY SUM(quantity) DESC LIMIT 1", nativeQuery = true)
+    Long findTopProduct();
 }

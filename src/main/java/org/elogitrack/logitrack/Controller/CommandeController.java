@@ -1,60 +1,67 @@
-package org.elogitrack.logitrack.Controller;
+package org.elogitrack.logitrack.controller;
 
-import org.elogitrack.logitrack.Model.Commande;
-import org.elogitrack.logitrack.Model.LigneCommande;
-import org.elogitrack.logitrack.Model.Produit;
-import org.elogitrack.logitrack.Service.CommandeService;
-import org.elogitrack.logitrack.Service.StatistiqueService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.elogitrack.logitrack.dto.commandedto.CommandeRequestDTO;
+import org.elogitrack.logitrack.dto.commandedto.CommandeResponseDTO;
+import org.elogitrack.logitrack.dto.commandedto.UpdateStatutDTO;
+import org.elogitrack.logitrack.dto.lignecommandedto.LigneCommandeRequestDTO;
+import org.elogitrack.logitrack.model.Commande;
+import org.elogitrack.logitrack.repository.CommandeRepository;
+import org.elogitrack.logitrack.service.CommandeService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/commande")
 public class CommandeController {
-    @Autowired
-    private CommandeService commandeService;
 
-    @Autowired
-    private StatistiqueService statistiqueService;
+    private final CommandeService commandeService;
+    private final CommandeRepository commandeRepository;
+
+    public CommandeController(CommandeService commandeService,
+                              CommandeRepository commandeRepository) {
+        this.commandeService = commandeService;
+        this.commandeRepository = commandeRepository;
+    }
 
     @PostMapping
-    public Commande createCommande(@RequestBody Commande commande){
-        return commandeService.createCommande(commande);
+    public ResponseEntity<CommandeResponseDTO> createCommande(@RequestBody CommandeRequestDTO commande){
+        return new ResponseEntity<>(commandeService.createCommande(commande), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{id}/products")
+    public ResponseEntity<CommandeResponseDTO> addProduitToCommande(
+            @PathVariable Long id,
+            @RequestBody LigneCommandeRequestDTO dto){
+
+        return ResponseEntity.ok(commandeService.addProduitToOrder(id, dto));
     }
 
     @GetMapping("/{id}")
-    public Commande getCommandeById(@PathVariable Long id){
-        return commandeService.getCommandeById(id);
+    public ResponseEntity<CommandeResponseDTO> getCommandeById(@PathVariable Long id){
+        return ResponseEntity.ok(commandeService.getCommandeById(id));
     }
 
     @GetMapping
-    public List<Commande> getAllCommandes(){
-        return commandeService.getAllCommandes();
-    }
-    @PostMapping("/{idCommande}/products")
-    public LigneCommande addCommande(@PathVariable Long idCommande , @RequestParam Long idClient , @RequestParam int quantity){
-        return commandeService.addProduitToOrder(idCommande , idClient , quantity);
-    }
-
-    @PutMapping("/{id}/status")
-    public Commande updateStatus(@PathVariable Long id , @RequestBody String status){
-        return commandeService.updateStatus(id , status);
-    }
-
-    @GetMapping("/count")
-    public long countCommande(){
-        return commandeService.countCommande();
+    public ResponseEntity<List<CommandeResponseDTO>> getAllCommandes() {
+        return ResponseEntity.ok(commandeService.getAllCommandes());
     }
 
     @GetMapping("/client/{id}")
-    public List<Commande> getCommandeByClient(@PathVariable Long id){
-        return commandeService.getCommandeByIdClient(id);
+    public ResponseEntity<List<CommandeResponseDTO>> getCommandeByClient(@PathVariable Long id){
+        return ResponseEntity.ok(commandeService.getCommandeByIdClient(id));
     }
 
-    @GetMapping("/tpo-product")
-    public Produit topProduit(){
-        return statistiqueService.getTopProduit();
+    @GetMapping("/count")
+    public ResponseEntity<Long> countCommande(){
+
+        return ResponseEntity.ok(commandeService.countCommande());
     }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<CommandeResponseDTO> updateStatus(@PathVariable Long id, @RequestBody UpdateStatutDTO status){
+        return ResponseEntity.ok(commandeService.updateStatus(id, status));
+    }
+
 }

@@ -1,85 +1,127 @@
-package org.elogitrack.logitrack.Service;
+package org.elogitrack.logitrack.service;
 
-import org.elogitrack.logitrack.Model.Commande;
-import org.elogitrack.logitrack.Model.LigneCommande;
-import org.elogitrack.logitrack.Model.Produit;
-import org.elogitrack.logitrack.Repository.ClientRepository;
-import org.elogitrack.logitrack.Repository.CommandeRepository;
-import org.elogitrack.logitrack.Repository.LigneCommandeRepository;
-import org.elogitrack.logitrack.Repository.ProduitRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.elogitrack.logitrack.dto.commandedto.CommandeRequestDTO;
+import org.elogitrack.logitrack.dto.commandedto.CommandeResponseDTO;
+import org.elogitrack.logitrack.dto.commandedto.UpdateStatutDTO;
+import org.elogitrack.logitrack.dto.lignecommandedto.LigneCommandeRequestDTO;
+import org.elogitrack.logitrack.model.Commande;
+import org.elogitrack.logitrack.model.LigneCommande;
+import org.elogitrack.logitrack.model.Produit;
+import org.elogitrack.logitrack.repository.ClientRepository;
+import org.elogitrack.logitrack.repository.CommandeRepository;
+import org.elogitrack.logitrack.repository.LigneCommandeRepository;
+import org.elogitrack.logitrack.repository.ProduitRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CommandeService {
 
-    @Autowired
-    private CommandeRepository commandeRepository;
+    private final CommandeRepository commandeRepository;
+    private final ClientRepository clientRepository;
+    private final ProduitRepository produitRepository;
+    private final LigneCommandeRepository ligneCommandeRepository;
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    private LigneCommandeRepository ligneCommandeRepository;
+    public CommandeService(CommandeRepository commandeRepository,
+                           ClientRepository clientRepository,
+                           ProduitRepository produitRepository,
+                           LigneCommandeRepository ligneCommandeRepository,
+                           ModelMapper modelMapper) {
+        this.commandeRepository = commandeRepository;
+        this.clientRepository = clientRepository;
+        this.produitRepository = produitRepository;
+        this.ligneCommandeRepository = ligneCommandeRepository;
+        this.modelMapper = modelMapper;
+    }
 
-    @Autowired
-    private ClientRepository clientRepository;
+    public CommandeResponseDTO createCommande(CommandeRequestDTO dto){
 
-    @Autowired
-    private ProduitRepository produitRepository;
+        Commande commande = new Commande();
 
-    public Commande createCommande(Commande commande){
-        Long clientId = commande.getClient().getIdClient();
+        var client = clientRepository.findById(dto.getClientId())
+                .orElseThrow(() -> new RuntimeException("Client introuvable"));
 
-        var existingClient = clientRepository.findById(clientId)
-                .orElseThrow(() -> new RuntimeException("Client introuvable avec l'id: " + clientId));
-
-        commande.setClient(existingClient);
-
+        commande.setClient(client);
         commande.setDateCommande(LocalDate.now());
         commande.setStatut("EN_ATTENTE");
 
-        return commandeRepository.save(commande);
+        commande = commandeRepository.save(commande);
+
+        return modelMapper.map(commande, CommandeResponseDTO.class);
     }
 
-    public LigneCommande addProduitToOrder(Long idOrder , Long idProduct , int quantity){
-        Commande commande = commandeRepository.findById(idOrder).orElseThrow();
-        Produit produit = produitRepository.findById(idProduct).orElseThrow();
+    public CommandeResponseDTO addProduitToOrder(Long idOrder , LigneCommandeRequestDTO dto){
 
-        LigneCommande ligneCommande = new LigneCommande();
-        ligneCommande.setCommande(commande);
-        ligneCommande.setProduit(produit);
-        ligneCommande.setQuantity(quantity);
-        ligneCommande.setQuantity(produit.getQuantity() - quantity);
+        Commande commande = commandeRepository.findById(idOrder)
+                .orElseThrow(() -> new RuntimeException("Commande introuvable"));
+        Produit produit = produitRepository.findById(dto.getProduitId())
+                .orElseThrow(() -> new RuntimeException("Produit introuvable"));
+
+        if(produit.getQuantity() < dto.getQuantity()){
+            throw new RuntimeException("Stock insuffisant");
+        }
+
+        var existingLine = commande.getLigneCommanden().stream()
+                .filter(line -> line.getProduit().getIdProduit().equals(produit.getIdProduit()))
+                .findFirst();
+
+        if (existingLine.isPresent()) {
+            LigneCommande line = existingLine.get();
+            line.setQuantity(line.getQuantity() + dto.getQuantity());
+            ligneCommandeRepository.save(line);
+        } else {
+            LigneCommande ligneCommande = new LigneCommande();
+            ligneCommande.setCommande(commande);
+            ligneCommande.setProduit(produit);
+            ligneCommande.setQuantity(dto.getQuantity());
+
+            commande.getLigneCommanden().add(ligneCommande);
+            ligneCommandeRepository.save(ligneCommande);
+        }
+
+        produit.setQuantity(produit.getQuantity() - dto.getQuantity());
         produitRepository.save(produit);
-        return ligneCommandeRepository.save(ligneCommande);
+
+        commandeRepository.save(commande);
+
+        return modelMapper.map(commande, CommandeResponseDTO.class);
     }
 
-    public Commande updateStatus(Long id , String status){
+    public CommandeResponseDTO updateStatus(Long id , UpdateStatutDTO dto){
+
         Commande commande = commandeRepository.findById(id).orElseThrow();
-        commande.setStatut(status);
-        return commandeRepository.save(commande);
+        commande.setStatut(dto.getStatut());
+
+        commande = commandeRepository.save(commande);
+
+        return modelMapper.map(commande, CommandeResponseDTO.class);
     }
 
-    public List<Commande> getCommandeByIdClient(Long id){
-        return commandeRepository.findCommandeByIdClient(id);
+    public List<CommandeResponseDTO> getCommandeByIdClient(Long id){
+        return commandeRepository.findCommandeByIdClient(id)
+                .stream()
+                .map(c -> modelMapper.map(c, CommandeResponseDTO.class))
+                .toList();
     }
 
     public long countCommande(){
         return commandeRepository.countCommandes();
     }
 
-    public List<Commande> getAllCommandes() {
-        return commandeRepository.findAll();
+    public List<CommandeResponseDTO> getAllCommandes() {
+        return commandeRepository.findAll()
+                .stream()
+                .map(c -> modelMapper.map(c, CommandeResponseDTO.class))
+                .toList();
     }
 
-    public Commande getCommandeById(Long id) {
-        return commandeRepository.findById(id).orElseThrow();
-    }
-
-    public Commande saveCommande(Commande commande) {
-        return commandeRepository.save(commande);
+    public CommandeResponseDTO getCommandeById(Long id) {
+        Commande commande = commandeRepository.findById(id).orElseThrow();
+        return modelMapper.map(commande, CommandeResponseDTO.class);
     }
 
     public void deleteCommande(Long id) {

@@ -1,4 +1,4 @@
-package org.elogitrack.logitrack.Model;
+package org.elogitrack.logitrack.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -24,6 +24,5 @@ public class LigneCommande {
     @ManyToOne
     @JoinColumn(name = "id_commande", nullable = false)
     @JsonIgnore
-    @JsonIgnoreProperties("ligneCommande")
     private Commande commande;
 }

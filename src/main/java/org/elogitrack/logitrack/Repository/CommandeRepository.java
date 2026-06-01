@@ -12,8 +12,8 @@ import java.util.List;
 @Repository
 public interface CommandeRepository extends JpaRepository<Commande, Long> {
     @Query("SELECT c FROM Commande c WHERE c.client.id = :clientId")
-
     List<Commande> findCommandeByIdClient(@Param("clientId") Long clientId);
+
     @Query("SELECT COUNT(c) FROM Commande c")
     long countCommandes();
 

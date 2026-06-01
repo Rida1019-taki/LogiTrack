@@ -4,7 +4,7 @@ import lombok.Data;
 @Data
 public class LigneCommandeResponseDTO {
     private Long idLigneCommande;
-    private Long produitIdProduit; // Matches model produit.idProduit
-    private String produitNom;     // Matches model produit.nom
+    private Long produitIdProduit;
+    private String produitNom;
     private Integer quantity;
 }

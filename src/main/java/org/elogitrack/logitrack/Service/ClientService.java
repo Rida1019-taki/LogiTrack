@@ -35,6 +35,10 @@ public class ClientService {
         return modelMapper.map(client, ClientResponseDTO.class);
     }
 
+    public ClientResponseDTO findClientByEmail(String email){
+        Client client = clientRepository.findClientByEmail(email);
+        return modelMapper.map(client , ClientResponseDTO.class);
+    }
     public ClientResponseDTO saveClient(ClientRequestDTO dto){
         Client client = modelMapper.map(dto, Client.class);
         Client saved = clientRepository.save(client);

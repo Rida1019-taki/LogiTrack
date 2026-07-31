@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "ligne_commande")
+@Table(name = "ligne_commandes")
 @Getter
 @Setter
 public class LigneCommande {

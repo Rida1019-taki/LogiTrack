@@ -1,0 +1,50 @@
+package org.elogitrack.logitrack.security;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class JwtUtil {
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+    @Value("${jwt.expiration}")
+    private int jwtExpiration;
+
+
+    public String genereteToken(String email, String role, Long userId, Long profileId){
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("role", role)
+                .claim("id", userId)
+                .claim("profileId", profileId)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpiration))
+                .signWith(SignatureAlgorithm.HS256 , jwtSecret)
+                .compact();
+    }
+
+    public String getUserFromToken(String token){
+        return Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .build()
+                .parseClaimsJws(token)
+                .getPayload()
+                .getSubject();
+    }
+
+    public boolean validateJwtToken(String token){
+        try{
+            Jwts.parser().setSigningKey(jwtSecret).build().parseClaimsJws(token);
+            return true;
+        }catch (Exception e){
+            log.error("JWT validation error: {}" , e.getMessage());
+        }
+        return false;
+    }
+}

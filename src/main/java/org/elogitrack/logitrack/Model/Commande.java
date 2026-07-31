@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "commande")
+@Table(name = "commandes")
 @Getter
 @Setter
 public class Commande {

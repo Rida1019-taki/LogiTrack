@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "client")
+@Table(name = "clients")
 @Getter
 @Setter
 @SuppressWarnings("JpaDataSourceORMInspection")

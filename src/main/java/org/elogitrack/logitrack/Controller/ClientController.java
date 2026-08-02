@@ -57,7 +57,6 @@ public class ClientController {
     public ResponseEntity<ClientResponseDTO> updateClient(
             @PathVariable Long id,
             @RequestBody ClientRequestDTO dto){
-
         return ResponseEntity.ok(clientService.updateClient(id,dto));
     }
 

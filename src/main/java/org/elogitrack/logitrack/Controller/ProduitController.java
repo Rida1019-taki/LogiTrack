@@ -6,6 +6,7 @@ import org.elogitrack.logitrack.service.ProduitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,11 +18,13 @@ public class ProduitController {
     private ProduitService produitService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<ProduitResponseDTO> addProduit(@RequestBody ProduitRequestDTO produitDto){
         return new ResponseEntity<>(produitService.createProduit(produitDto),HttpStatus.CREATED);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
     public ResponseEntity<List<ProduitResponseDTO>> getAllProduits(){
         return ResponseEntity.ok(produitService.getAllProduits());
     }
@@ -37,17 +40,20 @@ public class ProduitController {
     }
 
     @GetMapping("/low-stock")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<List<ProduitResponseDTO>> getProduitLowStock(@RequestParam int quantity){
         return ResponseEntity.ok(produitService.getLowStockProduits(quantity));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProduit(@PathVariable("id") Long id){
         produitService.deleteProduit(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/top-product")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
     public ProduitResponseDTO topProduit() {
         return produitService.getTopProduit();
     }

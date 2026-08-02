@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,12 +23,14 @@ public class ClientController {
     private ModelMapper modelMapper;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<ClientResponseDTO> addClient(@RequestBody ClientRequestDTO dto) {
         ClientResponseDTO response = clientService.saveClient(dto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
     public ResponseEntity<List<ClientResponseDTO>> getAllClients(){
         return ResponseEntity.ok(clientService.getAllClients());
     }
@@ -38,11 +41,13 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
     public ResponseEntity<ClientResponseDTO> getClientById(@PathVariable("id") Long id){
         return ResponseEntity.ok(clientService.getClientById(id));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteClient(@PathVariable("id") Long id){
 
         clientService.deleteClient(id);

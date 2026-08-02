@@ -37,7 +37,32 @@ public class ClientController {
         return ResponseEntity.ok(clientService.getAllClients(pageable));
     }
 
+    @GetMapping("/count")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    public ResponseEntity<Long> countClients(){
+        return ResponseEntity.ok(clientService.countClients());
+    }
+
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
+    public ResponseEntity<List<ClientResponseDTO>> search(
+            @RequestParam String nom){
+
+        return ResponseEntity.ok(
+                clientService.searchByNom(nom));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    public ResponseEntity<ClientResponseDTO> updateClient(
+            @PathVariable Long id,
+            @RequestBody ClientRequestDTO dto){
+
+        return ResponseEntity.ok(clientService.updateClient(id,dto));
+    }
+
     @GetMapping("/email/{email}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
     public ResponseEntity<ClientResponseDTO> findClientByEmail(@PathVariable String email){
         return ResponseEntity.ok(clientService.findClientByEmail(email));
     }

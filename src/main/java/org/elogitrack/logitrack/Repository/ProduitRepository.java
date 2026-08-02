@@ -16,4 +16,7 @@ public interface ProduitRepository extends JpaRepository<Produit , Long> {
 
     @Query("SELECT p FROM Produit p WHERE p.quantity < :quantity")
     List<Produit> findProduitsLowStock(@Param("quantity") int quantity);
+
+    @Query("SELECT COUNT(p) FROM Produit p")
+    long countProduits();
 }

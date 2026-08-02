@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 @Service
@@ -25,6 +26,31 @@ public class ClientService {
     public Page<ClientResponseDTO> getAllClients(Pageable pageable) {
         return clientRepository.findAll(pageable)
                 .map(client -> modelMapper.map(client, ClientResponseDTO.class));
+    }
+
+    public ClientResponseDTO updateClient(Long id, ClientRequestDTO dto){
+
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Client introuvable"));
+
+        client.setNom(dto.getNom());
+        client.setEmail(dto.getEmail());
+
+        client = clientRepository.save(client);
+
+        return modelMapper.map(client, ClientResponseDTO.class);
+    }
+
+    public long countClients(){
+        return clientRepository.countClients();
+    }
+
+    public List<ClientResponseDTO> searchByNom(String nom){
+
+        return clientRepository.findByNomContainingIgnoreCase(nom)
+                .stream()
+                .map(c -> modelMapper.map(c,ClientResponseDTO.class))
+                .toList();
     }
 
     public ClientResponseDTO getClientById(Long id) {

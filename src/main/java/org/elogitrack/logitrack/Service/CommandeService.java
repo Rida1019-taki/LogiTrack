@@ -120,6 +120,27 @@ public class CommandeService {
                 .map(commande -> modelMapper.map(commande, CommandeResponseDTO.class));
     }
 
+    public List<CommandeResponseDTO> getByStatut(String statut){
+
+        return commandeRepository.findByStatut(statut)
+                .stream()
+                .map(c -> modelMapper.map(c,CommandeResponseDTO.class))
+                .toList();
+    }
+
+    public long countByStatut(String statut){
+        return commandeRepository.countByStatut(statut);
+    }
+
+    public List<CommandeResponseDTO> recentCommandes(){
+
+        return commandeRepository
+                .findTop5ByOrderByDateCommandeDesc()
+                .stream()
+                .map(c -> modelMapper.map(c,CommandeResponseDTO.class))
+                .toList();
+    }
+
     public CommandeResponseDTO getCommandeById(Long id) {
         Commande commande = commandeRepository.findById(id).orElseThrow();
         return modelMapper.map(commande, CommandeResponseDTO.class);

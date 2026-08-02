@@ -29,12 +29,37 @@ public class ProduitController {
     public ResponseEntity<Page<ProduitResponseDTO>> getAllProduits(Pageable pageable) {
         return ResponseEntity.ok(produitService.getAllProduits(pageable));
     }
+
     @GetMapping("/category/{category}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
     public ResponseEntity<List<ProduitResponseDTO>> getByCategorie(@PathVariable("category") String category){
         return ResponseEntity.ok(produitService.getProduitsByCategory(category));
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
+    public ResponseEntity<ProduitResponseDTO> getProduitById(@PathVariable Long id) {
+        return ResponseEntity.ok(produitService.getProduitById(id));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    public ResponseEntity<ProduitResponseDTO> updateProduit(
+            @PathVariable Long id,
+            @RequestBody ProduitRequestDTO dto){
+
+        return ResponseEntity.ok(produitService.updateProduit(id,dto));
+    }
+
+    @GetMapping("/count")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    public ResponseEntity<Long> countProduits(){
+        return ResponseEntity.ok(produitService.countProduits());
+    }
+
+
     @GetMapping("/prix/{prix}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
     public ResponseEntity<List<ProduitResponseDTO>> getProduitByPrix(@PathVariable double prix){
         return ResponseEntity.ok(produitService.getProduitsByPriceLessThan(prix));
     }

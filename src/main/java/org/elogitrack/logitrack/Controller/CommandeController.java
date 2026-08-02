@@ -40,6 +40,31 @@ public class CommandeController {
         return ResponseEntity.ok(commandeService.addProduitToOrder(id, dto));
     }
 
+    @GetMapping("/status/{statut}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
+    public ResponseEntity<List<CommandeResponseDTO>> getByStatut(
+            @PathVariable String statut){
+
+        return ResponseEntity.ok(commandeService.getByStatut(statut));
+    }
+
+    @GetMapping("/count/{statut}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    public ResponseEntity<Long> countByStatut(
+            @PathVariable String statut){
+
+        return ResponseEntity.ok(
+                commandeService.countByStatut(statut));
+    }
+
+    @GetMapping("/recent")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    public ResponseEntity<List<CommandeResponseDTO>> recent(){
+
+        return ResponseEntity.ok(
+                commandeService.recentCommandes());
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
     public ResponseEntity<CommandeResponseDTO> getCommandeById(@PathVariable Long id){
@@ -68,6 +93,14 @@ public class CommandeController {
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
     public ResponseEntity<CommandeResponseDTO> updateStatus(@PathVariable Long id, @RequestBody UpdateStatutDTO status){
         return ResponseEntity.ok(commandeService.updateStatus(id, status));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteCommande(@PathVariable Long id) {
+
+        commandeService.deleteCommande(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

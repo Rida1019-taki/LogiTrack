@@ -38,6 +38,25 @@ public class ProduitService {
                 .map(produit -> modelMapper.map(produit, ProduitResponseDTO.class));
     }
 
+    public ProduitResponseDTO updateProduit(Long id, ProduitRequestDTO dto){
+
+        Produit produit = produitRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produit introuvable"));
+
+        produit.setNom(dto.getNom());
+        produit.setPrix(dto.getPrix());
+        produit.setQuantity(dto.getQuantity());
+        produit.setCategorie(dto.getCategorie());
+
+        produit = produitRepository.save(produit);
+
+        return modelMapper.map(produit, ProduitResponseDTO.class);
+    }
+
+    public long countProduits(){
+        return produitRepository.countProduits();
+    }
+
     public ProduitResponseDTO getProduitById(Long id) {
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produit introuvable"));

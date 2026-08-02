@@ -6,6 +6,8 @@ import org.elogitrack.logitrack.model.Client;
 import org.elogitrack.logitrack.service.ClientService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,8 +33,8 @@ public class ClientController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
-    public ResponseEntity<List<ClientResponseDTO>> getAllClients(){
-        return ResponseEntity.ok(clientService.getAllClients());
+    public ResponseEntity<Page<ClientResponseDTO>> getAllClients(Pageable pageable) {
+        return ResponseEntity.ok(clientService.getAllClients(pageable));
     }
 
     @GetMapping("/email/{email}")

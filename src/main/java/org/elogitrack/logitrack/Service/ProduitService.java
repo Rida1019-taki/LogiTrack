@@ -7,7 +7,8 @@ import org.elogitrack.logitrack.repository.LigneCommandeRepository;
 import org.elogitrack.logitrack.repository.ProduitRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Service
@@ -31,11 +32,10 @@ public class ProduitService {
         return modelMapper.map(produit, ProduitResponseDTO.class);
     }
 
-    public List<ProduitResponseDTO> getAllProduits() {
-        return produitRepository.findAll()
-                .stream()
-                .map(p -> modelMapper.map(p, ProduitResponseDTO.class))
-                .toList();
+    public Page<ProduitResponseDTO> getAllProduits(Pageable pageable) {
+
+        return produitRepository.findAll(pageable)
+                .map(produit -> modelMapper.map(produit, ProduitResponseDTO.class));
     }
 
     public ProduitResponseDTO getProduitById(Long id) {

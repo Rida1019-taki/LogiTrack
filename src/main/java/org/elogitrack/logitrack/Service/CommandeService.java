@@ -13,6 +13,8 @@ import org.elogitrack.logitrack.repository.LigneCommandeRepository;
 import org.elogitrack.logitrack.repository.ProduitRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -112,11 +114,10 @@ public class CommandeService {
         return commandeRepository.countCommandes();
     }
 
-    public List<CommandeResponseDTO> getAllCommandes() {
-        return commandeRepository.findAll()
-                .stream()
-                .map(c -> modelMapper.map(c, CommandeResponseDTO.class))
-                .toList();
+    public Page<CommandeResponseDTO> getAllCommandes(Pageable pageable) {
+
+        return commandeRepository.findAll(pageable)
+                .map(commande -> modelMapper.map(commande, CommandeResponseDTO.class));
     }
 
     public CommandeResponseDTO getCommandeById(Long id) {

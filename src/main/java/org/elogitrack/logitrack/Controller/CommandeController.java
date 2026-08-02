@@ -4,7 +4,6 @@ import org.elogitrack.logitrack.dto.commandedto.CommandeRequestDTO;
 import org.elogitrack.logitrack.dto.commandedto.CommandeResponseDTO;
 import org.elogitrack.logitrack.dto.commandedto.UpdateStatutDTO;
 import org.elogitrack.logitrack.dto.lignecommandedto.LigneCommandeRequestDTO;
-import org.elogitrack.logitrack.model.Commande;
 import org.elogitrack.logitrack.repository.CommandeRepository;
 import org.elogitrack.logitrack.service.CommandeService;
 import org.springframework.http.HttpStatus;
@@ -12,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/commande")
@@ -47,8 +48,8 @@ public class CommandeController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
-    public ResponseEntity<List<CommandeResponseDTO>> getAllCommandes() {
-        return ResponseEntity.ok(commandeService.getAllCommandes());
+    public ResponseEntity<Page<CommandeResponseDTO>> getAllCommandes(Pageable pageable) {
+        return ResponseEntity.ok(commandeService.getAllCommandes(pageable));
     }
 
     @GetMapping("/client/{id}")

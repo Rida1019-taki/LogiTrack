@@ -5,11 +5,10 @@ import org.elogitrack.logitrack.dto.clientdto.ClientResponseDTO;
 import org.elogitrack.logitrack.model.Client;
 import org.elogitrack.logitrack.repository.ClientRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ClientService {
@@ -23,11 +22,9 @@ public class ClientService {
         this.modelMapper = modelMapper;
     }
 
-    public List<ClientResponseDTO> getAllClients() {
-        return clientRepository.findAll()
-                .stream()
-                .map(client -> modelMapper.map(client, ClientResponseDTO.class))
-                .toList();
+    public Page<ClientResponseDTO> getAllClients(Pageable pageable) {
+        return clientRepository.findAll(pageable)
+                .map(client -> modelMapper.map(client, ClientResponseDTO.class));
     }
 
     public ClientResponseDTO getClientById(Long id) {

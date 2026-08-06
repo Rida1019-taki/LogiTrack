@@ -24,7 +24,6 @@ public class LigneCommandeService {
         this.modelMapper = modelMapper;
     }
 
-    // GET ALL
     public List<LigneCommandeResponseDTO> getAllLignesCommande() {
         return ligneCommandeRepository.findAll()
                 .stream()

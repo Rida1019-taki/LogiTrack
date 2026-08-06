@@ -29,24 +29,53 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
 
+        System.out.println("====== REQUEST ======");
+        System.out.println("URL : " + request.getRequestURI());
+        System.out.println("Authorization : " + authHeader);
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
+
             String token = authHeader.substring(7);
 
-            if (jwtUtil.validateJwtToken(token)) {
-                String username = jwtUtil.getUserFromToken(token);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            System.out.println("Token Valid : " + jwtUtil.validateJwtToken(token));
 
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+            if (jwtUtil.validateJwtToken(token)) {
+
+                String username = jwtUtil.getUserFromToken(token);
+
+                System.out.println("Username : " + username);
+
+                UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(username);
+
+                System.out.println("EMAIL = " + userDetails.getUsername());
+
+                System.out.println("ROLES = " + userDetails.getAuthorities());
+
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
+
+                System.out.println("Authentication OK");
             }
+
+        } else {
+
+            System.out.println("No Authorization Header");
+
         }
+
         filterChain.doFilter(request, response);
     }
 }

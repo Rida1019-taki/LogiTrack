@@ -2,70 +2,91 @@ package org.elogitrack.logitrack.service;
 
 import org.elogitrack.logitrack.dto.clientdto.ClientRequestDTO;
 import org.elogitrack.logitrack.dto.clientdto.ClientResponseDTO;
+import org.elogitrack.logitrack.mapper.ClientMapper;
 import org.elogitrack.logitrack.model.Client;
 import org.elogitrack.logitrack.repository.ClientRepository;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class ClientService {
 
     private final ClientRepository clientRepository;
-    private final ModelMapper modelMapper;
+    private final ClientMapper clientMapper;
 
-    public ClientService(ClientRepository clientRepository,
-                         ModelMapper modelMapper) {
+    public ClientService(
+            ClientRepository clientRepository,
+            ClientMapper clientMapper
+    ) {
         this.clientRepository = clientRepository;
-        this.modelMapper = modelMapper;
+        this.clientMapper = clientMapper;
     }
 
     public Page<ClientResponseDTO> getAllClients(Pageable pageable) {
         return clientRepository.findAll(pageable)
-                .map(client -> modelMapper.map(client, ClientResponseDTO.class));
+                .map(clientMapper::toResponseDTO);
     }
 
-    public ClientResponseDTO updateClient(Long id, ClientRequestDTO dto){
+    public ClientResponseDTO updateClient(Long id, ClientRequestDTO dto) {
 
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Client introuvable"));
+                .orElseThrow(() ->
+                        new RuntimeException("Client introuvable"));
 
         client.setNom(dto.getNom());
         client.setEmail(dto.getEmail());
+        client.setTelefone(dto.getTelefone());
+        client.setVille(dto.getVille());
 
-        client = clientRepository.save(client);
+        Client updated = clientRepository.save(client);
 
-        return modelMapper.map(client, ClientResponseDTO.class);
+        return clientMapper.toResponseDTO(updated);
     }
 
-    public long countClients(){
+    public long countClients() {
         return clientRepository.countClients();
     }
 
-    public List<ClientResponseDTO> searchByNom(String nom){
+    public List<ClientResponseDTO> searchByNom(String nom) {
 
         return clientRepository.findByNomContainingIgnoreCase(nom)
                 .stream()
-                .map(c -> modelMapper.map(c,ClientResponseDTO.class))
+                .map(clientMapper::toResponseDTO)
                 .toList();
     }
 
     public ClientResponseDTO getClientById(Long id) {
-        Client client = clientRepository.findById(id).orElseThrow(() -> new RuntimeException("Client introuvable"));
-        return modelMapper.map(client, ClientResponseDTO.class);
+
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Client introuvable"));
+
+        return clientMapper.toResponseDTO(client);
     }
 
-    public ClientResponseDTO findClientByEmail(String email){
+    public ClientResponseDTO findClientByEmail(String email) {
+
         Client client = clientRepository.findClientByEmail(email);
-        return modelMapper.map(client , ClientResponseDTO.class);
+
+        if (client == null) {
+            throw new RuntimeException("Client introuvable");
+        }
+
+        return clientMapper.toResponseDTO(client);
     }
-    public ClientResponseDTO saveClient(ClientRequestDTO dto){
-        Client client = modelMapper.map(dto, Client.class);
+
+    public ClientResponseDTO saveClient(ClientRequestDTO dto) {
+
+        Client client = clientMapper.toEntity(dto);
+
         Client saved = clientRepository.save(client);
-        return modelMapper.map(saved, ClientResponseDTO.class);
+
+        return clientMapper.toResponseDTO(saved);
     }
 
     public void deleteClient(Long id) {

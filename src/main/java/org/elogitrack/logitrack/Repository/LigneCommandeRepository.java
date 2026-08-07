@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LigneCommandeRepository extends JpaRepository<LigneCommande , Long> {
-    @Query(value = "SELECT id_produit FROM ligne_commande GROUP BY id_produit ORDER BY SUM(quantity) DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT id_produit FROM ligne_commandes GROUP BY id_produit ORDER BY SUM(quantity) DESC LIMIT 1", nativeQuery = true)
     Long findTopProduct();
 }

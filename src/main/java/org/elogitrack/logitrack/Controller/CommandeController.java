@@ -1,5 +1,6 @@
 package org.elogitrack.logitrack.controller;
 
+import jakarta.validation.Valid;
 import org.elogitrack.logitrack.dto.commandedto.CommandeRequestDTO;
 import org.elogitrack.logitrack.dto.commandedto.CommandeResponseDTO;
 import org.elogitrack.logitrack.dto.commandedto.UpdateStatutDTO;
@@ -89,10 +90,12 @@ public class CommandeController {
         return ResponseEntity.ok(commandeService.countCommande());
     }
 
-    @PutMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
-    public ResponseEntity<CommandeResponseDTO> updateStatus(@PathVariable Long id, @RequestBody UpdateStatutDTO status){
-        return ResponseEntity.ok(commandeService.updateStatus(id, status));
+    @PatchMapping("/{id}/statut")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    public ResponseEntity<CommandeResponseDTO> updateStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateStatutDTO dto) {
+        return ResponseEntity.ok(commandeService.updateStatus(id, dto));
     }
 
     @DeleteMapping("/{id}")

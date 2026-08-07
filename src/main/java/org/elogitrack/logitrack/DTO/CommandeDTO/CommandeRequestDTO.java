@@ -1,16 +1,22 @@
 package org.elogitrack.logitrack.dto.commandedto;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import lombok.Data;
 import org.elogitrack.logitrack.dto.lignecommandedto.LigneCommandeRequestDTO;
 
 import java.util.List;
-import lombok.Data;
 
 @Data
 public class CommandeRequestDTO {
-    private Long clientId;
-    private List<LigneCommandeRequestDTO> produits;
 
-    public Long getClientId() {
-        return clientId;
-    }
+    @NotNull(message = "Le client est obligatoire")
+    @Positive(message = "L'identifiant du client doit être positif")
+    private Long clientId;
+
+    @NotEmpty(message = "La commande doit contenir au moins un produit")
+    @Valid
+    private List<LigneCommandeRequestDTO> produits;
 }

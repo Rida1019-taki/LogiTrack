@@ -5,7 +5,4 @@ import lombok.Data;
 public class UpdateStatutDTO {
     private String statut;
 
-    public String getStatut() {
-        return statut;
-    }
 }

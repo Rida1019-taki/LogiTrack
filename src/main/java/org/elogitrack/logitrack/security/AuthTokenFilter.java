@@ -27,26 +27,35 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
-
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
+        if (authHeader == null) {
+            System.out.println("Authorization Header Missing");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        System.out.println("====== REQUEST ======");
-        System.out.println("URL : " + request.getRequestURI());
-        System.out.println("Authorization : " + authHeader);
+        if (!authHeader.toLowerCase().startsWith("bearer ")) {
+            System.out.println("Authorization Header Invalid");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        String token = authHeader.substring(7);
 
-            String token = authHeader.substring(7);
+        try {
 
-            System.out.println("Token Valid : " + jwtUtil.validateJwtToken(token));
+            boolean valid = jwtUtil.validateJwtToken(token);
 
-            if (jwtUtil.validateJwtToken(token)) {
+            System.out.println("Token Valid : " + valid);
+
+            if (valid) {
 
                 String username = jwtUtil.getUserFromToken(token);
 
@@ -55,24 +64,24 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 UserDetails userDetails =
                         userDetailsService.loadUserByUsername(username);
 
-                System.out.println("EMAIL = " + userDetails.getUsername());
+                System.out.println("EMAIL : " + userDetails.getUsername());
+                System.out.println("ROLES : " + userDetails.getAuthorities());
 
-                System.out.println("ROLES = " + userDetails.getAuthorities());
-
-                UsernamePasswordAuthenticationToken auth =
+                UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
-                                userDetails.getAuthorities());
+                                userDetails.getAuthorities()
+                        );
 
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                System.out.println("Authentication OK");
+                System.out.println("Authentication SUCCESS");
             }
 
-        } else {
+        } catch (Exception e) {
 
-            System.out.println("No Authorization Header");
+            System.out.println("JWT ERROR : " + e.getMessage());
 
         }
 

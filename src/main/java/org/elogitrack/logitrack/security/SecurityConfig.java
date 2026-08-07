@@ -25,11 +25,10 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private UserDetailsService userDetailsService;
+
     private AuthTokenFilter authTokenFilter;
 
-    public SecurityConfig(UserDetailsService userDetailsService , AuthTokenFilter authTokenFilter){
-        this.userDetailsService = userDetailsService;
+    public SecurityConfig(AuthTokenFilter authTokenFilter){
         this.authTokenFilter = authTokenFilter;
     }
 

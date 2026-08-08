@@ -43,9 +43,8 @@ public class CommandeService {
         this.commandeMapper = commandeMapper;
     }
 
-    public CommandeResponseDTO createCommande(
-            CommandeRequestDTO dto
-    ) {
+    @Transactional
+    public CommandeResponseDTO createCommande(CommandeRequestDTO dto) {
 
         var client = clientRepository.findById(dto.getClientId())
                 .orElseThrow(() ->
@@ -59,6 +58,42 @@ public class CommandeService {
 
         commande = commandeRepository.save(commande);
 
+        for (LigneCommandeRequestDTO ligneDto : dto.getProduits()) {
+
+            Produit produit = produitRepository.findById(ligneDto.getProduitId())
+                    .orElseThrow(() ->
+                            new RuntimeException(
+                                    "Produit introuvable avec ID: " + ligneDto.getProduitId()
+                            ));
+
+            if (ligneDto.getQuantity() == null || ligneDto.getQuantity() <= 0) {
+                throw new RuntimeException("La quantité doit être supérieure à 0");
+            }
+
+            if (produit.getQuantity() < ligneDto.getQuantity()) {
+                throw new RuntimeException(
+                        "Stock insuffisant pour le produit : " + produit.getNom()
+                                + ". Stock disponible : " + produit.getQuantity()
+                );
+            }
+
+            LigneCommande ligneCommande = new LigneCommande();
+
+            ligneCommande.setCommande(commande);
+            ligneCommande.setProduit(produit);
+            ligneCommande.setQuantity(ligneDto.getQuantity());
+
+            commande.getLigneCommanden().add(ligneCommande);
+
+            produit.setQuantity(
+                    produit.getQuantity() - ligneDto.getQuantity()
+            );
+
+            produitRepository.save(produit);
+        }
+
+        commande = commandeRepository.save(commande);
+
         return commandeMapper.toResponseDTO(commande);
     }
 
@@ -67,6 +102,10 @@ public class CommandeService {
             Long idOrder,
             LigneCommandeRequestDTO dto
     ) {
+
+        if (dto.getQuantity() == null || dto.getQuantity() <= 0) {
+            throw new RuntimeException("La quantité doit être supérieure à 0");
+        }
 
         Commande commande = commandeRepository.findById(idOrder)
                 .orElseThrow(() ->
@@ -77,7 +116,10 @@ public class CommandeService {
                         new RuntimeException("Produit introuvable"));
 
         if (produit.getQuantity() < dto.getQuantity()) {
-            throw new RuntimeException("Stock insuffisant");
+            throw new RuntimeException(
+                    "Stock insuffisant. Stock disponible : "
+                            + produit.getQuantity()
+            );
         }
 
         var existingLine = commande.getLigneCommanden()

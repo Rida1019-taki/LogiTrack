@@ -28,8 +28,13 @@ public class CommandeController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
-    public ResponseEntity<CommandeResponseDTO> createCommande(@RequestBody CommandeRequestDTO commande){
-        return new ResponseEntity<>(commandeService.createCommande(commande), HttpStatus.CREATED);
+    public ResponseEntity<CommandeResponseDTO> createCommande(
+            @Valid @RequestBody CommandeRequestDTO commande
+    ) {
+        return new ResponseEntity<>(
+                commandeService.createCommande(commande),
+                HttpStatus.CREATED
+        );
     }
 
     @PostMapping("/{id}/products")

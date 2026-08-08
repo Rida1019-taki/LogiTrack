@@ -16,8 +16,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/products")
 public class ProduitController {
-    @Autowired
+
     private ProduitService produitService;
+
+    public ProduitController(ProduitService produitService){
+        this.produitService = produitService;
+    }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")

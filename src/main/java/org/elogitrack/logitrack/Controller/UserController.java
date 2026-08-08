@@ -14,9 +14,11 @@ import java.util.List;
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
-
-    @Autowired
     private UserService userService;
+
+    public UserController(UserService userService){
+        this.userService = userService;
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")

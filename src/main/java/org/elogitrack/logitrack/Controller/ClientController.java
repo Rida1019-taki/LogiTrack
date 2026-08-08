@@ -19,8 +19,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/clients")
 public class ClientController {
-    @Autowired
+
     private ClientService clientService;
+
+    public ClientController(ClientService clientService){
+        this.clientService = clientService;
+    }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")

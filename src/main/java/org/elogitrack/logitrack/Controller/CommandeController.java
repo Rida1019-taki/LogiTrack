@@ -21,8 +21,7 @@ public class CommandeController {
 
     private final CommandeService commandeService;
 
-    public CommandeController(CommandeService commandeService,
-                              CommandeRepository commandeRepository) {
+    public CommandeController(CommandeService commandeService) {
         this.commandeService = commandeService;
     }
 

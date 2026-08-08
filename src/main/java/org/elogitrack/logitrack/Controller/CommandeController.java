@@ -41,7 +41,7 @@ public class CommandeController {
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<CommandeResponseDTO> addProduitToCommande(
             @PathVariable Long id,
-            @RequestBody LigneCommandeRequestDTO dto){
+            @Valid @RequestBody LigneCommandeRequestDTO dto){
 
         return ResponseEntity.ok(commandeService.addProduitToOrder(id, dto));
     }

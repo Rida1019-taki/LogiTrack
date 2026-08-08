@@ -1,5 +1,6 @@
 package org.elogitrack.logitrack.controller;
 
+import jakarta.validation.Valid;
 import org.elogitrack.logitrack.dto.clientdto.ClientRequestDTO;
 import org.elogitrack.logitrack.dto.clientdto.ClientResponseDTO;
 import org.elogitrack.logitrack.model.Client;
@@ -21,12 +22,9 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
-    public ResponseEntity<ClientResponseDTO> addClient(@RequestBody ClientRequestDTO dto) {
+    public ResponseEntity<ClientResponseDTO> addClient(@Valid @RequestBody ClientRequestDTO dto) {
         ClientResponseDTO response = clientService.saveClient(dto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -56,7 +54,7 @@ public class ClientController {
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<ClientResponseDTO> updateClient(
             @PathVariable Long id,
-            @RequestBody ClientRequestDTO dto){
+            @Valid @RequestBody ClientRequestDTO dto){
         return ResponseEntity.ok(clientService.updateClient(id,dto));
     }
 

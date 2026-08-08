@@ -1,5 +1,6 @@
 package org.elogitrack.logitrack.controller;
 
+import jakarta.validation.Valid;
 import org.elogitrack.logitrack.dto.produitdto.ProduitRequestDTO;
 import org.elogitrack.logitrack.dto.produitdto.ProduitResponseDTO;
 import org.elogitrack.logitrack.service.ProduitService;
@@ -20,7 +21,7 @@ public class ProduitController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
-    public ResponseEntity<ProduitResponseDTO> addProduit(@RequestBody ProduitRequestDTO produitDto){
+    public ResponseEntity<ProduitResponseDTO> addProduit(@Valid @RequestBody ProduitRequestDTO produitDto){
         return new ResponseEntity<>(produitService.createProduit(produitDto),HttpStatus.CREATED);
     }
 
@@ -46,7 +47,7 @@ public class ProduitController {
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<ProduitResponseDTO> updateProduit(
             @PathVariable Long id,
-            @RequestBody ProduitRequestDTO dto){
+            @Valid @RequestBody ProduitRequestDTO dto){
 
         return ResponseEntity.ok(produitService.updateProduit(id,dto));
     }

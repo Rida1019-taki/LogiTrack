@@ -89,7 +89,6 @@ public class SecurityConfig {
         ));
 
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

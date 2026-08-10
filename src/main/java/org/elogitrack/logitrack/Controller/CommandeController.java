@@ -95,7 +95,7 @@ public class CommandeController {
     }
 
     @PatchMapping("/{id}/statut")
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','AGENT')")
     public ResponseEntity<CommandeResponseDTO> updateStatus(
             @PathVariable Long id,
             @Valid @RequestBody UpdateStatutDTO dto) {

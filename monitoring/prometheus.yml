@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/alert.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+scrape_configs:
+
+  # LogiTrack Spring Boot API
+  - job_name: 'logitrack-api'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets:
+          - 'logitrack-api:8080'
+
+  # Prometheus lui-même
+  - job_name: 'prometheus'
+    static_configs:
+      - targets:
+          - 'prometheus:9090'

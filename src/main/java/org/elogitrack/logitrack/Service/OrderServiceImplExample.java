@@ -7,10 +7,6 @@ import org.elogitrack.logitrack.dto.NotificationRequestDTO;
 import org.elogitrack.logitrack.enums.NotificationType;
 import org.springframework.stereotype.Service;
 
-/**
- * Example Service demonstrating how to inject and use the NotificationClient.
- * This can be adapted into your actual CommandeService / OrderService.
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -20,10 +16,7 @@ public class OrderServiceImplExample {
 
     public void createOrder(Long orderId, String customerEmail) {
         log.info("Creating order {} for customer {}", orderId, customerEmail);
-        
-        // 1. Order Creation Logic Here...
 
-        // 2. Send Notification Synchronously
         try {
             NotificationRequestDTO notificationRequest = NotificationRequestDTO.builder()
                     .recipient(customerEmail)
